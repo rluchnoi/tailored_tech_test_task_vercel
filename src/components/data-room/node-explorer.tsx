@@ -5,6 +5,7 @@ import { NodeCard } from "./node-card";
 import { NodeRow } from "./node-row";
 import { EmptyState } from "./empty-state";
 import { ExplorerSkeleton } from "./explorer-skeleton";
+import { SearchResults } from "./search-results";
 import type { ViewMode } from "./data-room-shell";
 import type { DataRoomNode, FileNode } from "@/lib/types";
 
@@ -31,13 +32,9 @@ export function NodeExplorer({
   onUpload: () => void;
   onNewFolder: () => void;
 } & NodeActionHandlers) {
-  const { loading, children, navigateTo } = useDataRoom();
+  const { loading, children, navigateTo, isSearching } = useDataRoom();
 
   if (loading) return <ExplorerSkeleton viewMode={viewMode} />;
-
-  if (children.length === 0) {
-    return <EmptyState onUpload={onUpload} onNewFolder={onNewFolder} />;
-  }
 
   const open = (node: DataRoomNode) => {
     if (node.type === "folder") navigateTo(node.id);
@@ -45,6 +42,15 @@ export function NodeExplorer({
   };
 
   const actions: NodeActionHandlers = { onOpenFile, onRename, onDelete };
+
+  // A live query replaces folder browsing with global search results.
+  if (isSearching) {
+    return <SearchResults onOpen={open} {...actions} />;
+  }
+
+  if (children.length === 0) {
+    return <EmptyState onUpload={onUpload} onNewFolder={onNewFolder} />;
+  }
 
   if (viewMode === "list") {
     return (

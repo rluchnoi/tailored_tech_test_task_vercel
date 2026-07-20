@@ -1,10 +1,15 @@
 # Acme Data Room — Project Guide for Claude
 
 A single-page **Data Room** (secure document repository, à la Google Drive/Dropbox)
-built for a take-home task. Users create nested folders and upload/view/rename/delete
-PDF files. There is **no real backend** — all data (metadata *and* file bytes) lives
-in the browser via IndexedDB, behind a repository layer that a real API could later
-replace without touching the UI.
+built for a take-home task. Users create nested folders, upload/view/rename/delete
+PDF files, and **search documents by filename** across the whole Data Room. There is
+**no real backend** — all data (metadata *and* file bytes) lives in the browser via
+IndexedDB, behind a repository layer that a real API could later replace without
+touching the UI.
+
+Search is **filename only** (global, case-insensitive, debounced). Content/full-text
+search was scoped out on purpose — it would need PDF text extraction (pdfjs) and
+wouldn't cover scanned/image PDFs without OCR. Don't add it without an explicit ask.
 
 > **Next.js 16 note:** this is a newer Next.js than older training data assumes —
 > APIs, conventions, and file structure may differ. Consult the guides in
@@ -56,16 +61,20 @@ src/lib/
   format.ts                   byte-size & relative-time formatting
   samplePdf.ts                generates valid demo PDFs at runtime
   repository/
-    nodeRepository.ts         ALL persistence: list/get/create/rename/delete/getBlob
+    nodeRepository.ts         ALL persistence: list/get/create/rename/delete/getBlob,
+                              searchByName, getSubtreeStats
     seed.ts                   first-run demo content (only if store is empty)
 
 src/components/data-room/
-  data-room-provider.tsx      Client state: current folder, children, all mutations,
-                              seeding on mount. Exposes useDataRoom().
+  data-room-provider.tsx      Client state: current folder, children, subtree stats,
+                              search query/results (debounced), all mutations, seeding
+                              on mount. Exposes useDataRoom().
   data-room-shell.tsx         Top-level layout; owns UI state (view mode, which dialog
                               is open, upload handler + hidden <input>).
-  sidebar.tsx, toolbar.tsx, breadcrumbs.tsx
-  node-explorer.tsx           loading / empty / grid / list switch; defines NodeActionHandlers
+  sidebar.tsx, toolbar.tsx, breadcrumbs.tsx, search-box.tsx
+  node-explorer.tsx           loading / empty / search / grid / list switch; defines
+                              NodeActionHandlers
+  search-results.tsx          flat, path-annotated results with match highlighting
   node-card.tsx, node-row.tsx, node-icon.tsx, node-actions-menu.tsx
   empty-state.tsx, explorer-skeleton.tsx, drop-zone.tsx, pdf-viewer.tsx
   dialogs/                    name-dialog (shared), create-folder, rename, delete
@@ -78,6 +87,16 @@ Single adjacency-list `Node` keyed by `id`, pointing at its parent via `parentId
 `mimeType`, `size`, and a `blobId` into a separate `blobs` store. This makes nesting,
 recursive delete, and "list children of X" trivial. Two IndexedDB stores: `nodes`
 (indexed by `parentId`) and `blobs`.
+
+### Search
+
+`searchByName` loads all node metadata once (no blobs) and matches in memory,
+resolving each hit's folder path from the same snapshot. The provider debounces the
+query (~200ms); when the query is non-empty, `node-explorer` renders `search-results`
+(a flat, path-annotated list) instead of the folder grid. `navigateTo` always clears
+the query, so opening a folder result drops you into that folder. Stale results are
+never cleared synchronously in the debounce effect (they're just ignored when
+`isSearching` is false) — this avoids the `set-state-in-effect` lint rule.
 
 ## Conventions
 

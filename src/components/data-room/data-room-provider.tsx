@@ -35,6 +35,12 @@ interface DataRoomContextValue {
   children: DataRoomNode[];
   /** Recursive totals for the current folder's whole subtree. */
   stats: repo.FolderStats;
+  /** Current filename-search query (empty string = not searching). */
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  /** True while a non-empty query is active; the explorer shows results. */
+  isSearching: boolean;
+  searchResults: repo.SearchResult[];
   navigateTo: (folderId: string | null) => void;
   createFolder: (name: string) => Promise<FolderNode>;
   uploadFiles: (files: File[]) => Promise<UploadResult>;
@@ -55,9 +61,16 @@ export function DataRoomProvider({ children }: { children: React.ReactNode }) {
     files: 0,
     size: 0,
   });
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<repo.SearchResult[]>([]);
+  const isSearching = searchQuery.trim().length > 0;
 
   // Guards against out-of-order async loads when navigation changes rapidly.
   const loadToken = useRef(0);
+
+  const runSearch = useCallback(async (query: string) => {
+    setSearchResults(await repo.searchByName(query));
+  }, []);
 
   const load = useCallback(async (folderId: string | null) => {
     const token = ++loadToken.current;
@@ -88,13 +101,33 @@ export function DataRoomProvider({ children }: { children: React.ReactNode }) {
     };
   }, [load]);
 
-  const refresh = useCallback(
-    () => load(currentFolderId),
-    [load, currentFolderId],
-  );
+  // Debounce the query, then search. Results are only cleared implicitly (we
+  // ignore them when `isSearching` is false), which avoids a synchronous
+  // setState in the effect body.
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (!query) return;
+    let active = true;
+    const handle = setTimeout(() => {
+      if (active) void runSearch(query);
+    }, 200);
+    return () => {
+      active = false;
+      clearTimeout(handle);
+    };
+  }, [searchQuery, runSearch]);
+
+  const refresh = useCallback(async () => {
+    await load(currentFolderId);
+    // Keep search results in sync after a mutation (e.g. a renamed/deleted hit).
+    const query = searchQuery.trim();
+    if (query) await runSearch(query);
+  }, [load, currentFolderId, searchQuery, runSearch]);
 
   const navigateTo = useCallback(
     (folderId: string | null) => {
+      // Navigating always exits search and lands in the chosen folder.
+      setSearchQuery("");
       setCurrentFolderId(folderId);
       void load(folderId);
     },
@@ -155,6 +188,10 @@ export function DataRoomProvider({ children }: { children: React.ReactNode }) {
       breadcrumb,
       children: nodes,
       stats,
+      searchQuery,
+      setSearchQuery,
+      isSearching,
+      searchResults,
       navigateTo,
       createFolder,
       uploadFiles,
@@ -168,6 +205,9 @@ export function DataRoomProvider({ children }: { children: React.ReactNode }) {
       breadcrumb,
       nodes,
       stats,
+      searchQuery,
+      isSearching,
+      searchResults,
       navigateTo,
       createFolder,
       uploadFiles,

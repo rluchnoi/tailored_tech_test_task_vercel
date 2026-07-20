@@ -4,6 +4,7 @@ import { FolderPlus, LayoutGrid, List, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Breadcrumbs } from "./breadcrumbs";
+import { SearchBox } from "./search-box";
 import type { ViewMode } from "./data-room-shell";
 
 /**
@@ -22,24 +23,30 @@ export function Toolbar({
   onUpload: () => void;
 }) {
   return (
-    <header className="bg-background/80 sticky top-0 z-10 flex items-center gap-3 border-b px-4 py-3 backdrop-blur sm:px-6">
-      <div className="min-w-0 flex-1">
-        <Breadcrumbs />
+    <header className="bg-background/80 sticky top-0 z-10 flex flex-wrap items-center gap-2 border-b px-4 py-3 backdrop-blur sm:flex-nowrap sm:gap-3 sm:px-6">
+      <div className="order-1 flex min-w-0 flex-1 items-center gap-2">
+        <div className="min-w-0 flex-1">
+          <Breadcrumbs />
+        </div>
+
+        {/* Create actions collapse to icon buttons on mobile (sidebar hidden). */}
+        <div className="flex items-center gap-1 md:hidden">
+          <Button size="icon" variant="ghost" onClick={onUpload}>
+            <Upload className="size-4" />
+            <span className="sr-only">Upload PDF</span>
+          </Button>
+          <Button size="icon" variant="ghost" onClick={onNewFolder}>
+            <FolderPlus className="size-4" />
+            <span className="sr-only">New folder</span>
+          </Button>
+        </div>
       </div>
 
-      {/* Create actions collapse to icon buttons on mobile (sidebar hidden). */}
-      <div className="flex items-center gap-1 md:hidden">
-        <Button size="icon" variant="ghost" onClick={onUpload}>
-          <Upload className="size-4" />
-          <span className="sr-only">Upload PDF</span>
-        </Button>
-        <Button size="icon" variant="ghost" onClick={onNewFolder}>
-          <FolderPlus className="size-4" />
-          <span className="sr-only">New folder</span>
-        </Button>
-      </div>
+      {/* Search: full-width second row on mobile, inline between breadcrumb and
+          the view toggle on larger screens. */}
+      <SearchBox className="order-3 w-full sm:order-2 sm:w-56 md:w-72" />
 
-      <div className="bg-muted flex items-center rounded-lg p-0.5">
+      <div className="bg-muted order-2 flex shrink-0 items-center rounded-lg p-0.5 sm:order-3">
         <ViewToggleButton
           active={viewMode === "grid"}
           onClick={() => onViewModeChange("grid")}

@@ -188,6 +188,47 @@ export async function countNodes(): Promise<number> {
   return readRequest<number>(NODES_STORE, (store) => store.count());
 }
 
+export interface SearchResult {
+  node: DataRoomNode;
+  /** Ancestor folders of the match, root-first, for showing its location. */
+  path: FolderNode[];
+}
+
+/**
+ * Case-insensitive filename search across the entire Data Room. Loads all node
+ * metadata once (cheap — no blobs) and matches in memory, resolving each hit's
+ * folder path from the same snapshot so results can show where they live.
+ */
+export async function searchByName(query: string): Promise<SearchResult[]> {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return [];
+
+  const all = await readRequest<DataRoomNode[]>(NODES_STORE, (store) =>
+    store.getAll(),
+  );
+  const byId = new Map(all.map((node) => [node.id, node]));
+
+  const pathOf = (node: DataRoomNode): FolderNode[] => {
+    const chain: FolderNode[] = [];
+    let parentId = node.parentId;
+    while (parentId) {
+      const parent = byId.get(parentId);
+      if (!parent || parent.type !== "folder") break;
+      chain.unshift(parent);
+      parentId = parent.parentId;
+    }
+    return chain;
+  };
+
+  return all
+    .filter((node) => node.name.toLowerCase().includes(needle))
+    .sort((a, b) => {
+      if (a.type !== b.type) return a.type === "folder" ? -1 : 1;
+      return a.name.localeCompare(b.name, undefined, { sensitivity: "base" });
+    })
+    .map((node) => ({ node, path: pathOf(node) }));
+}
+
 export interface FolderStats {
   folders: number;
   files: number;
