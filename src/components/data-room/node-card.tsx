@@ -41,18 +41,14 @@ export function NodeCard({
       // Capped stagger so a large folder still finishes settling quickly.
       style={{ animationDelay: `${Math.min(index * 28, 320)}ms` }}
       className={cn(
-        "group animate-rise bg-card relative flex flex-col gap-3 rounded-xl border p-3.5 text-left",
+        "animate-rise bg-card relative flex flex-col gap-3 rounded-xl border p-3.5 text-left",
         "transition-[box-shadow,border-color,background-color] duration-200 ease-out",
         "hover:border-primary/35 hover:bg-accent/40 hover:shadow-md hover:shadow-primary/5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       )}
     >
       <div className="flex items-start justify-between">
         <NodeIcon node={node} />
-        <NodeActionsMenu
-          node={node}
-          {...actions}
-          className="opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100"
-        />
+        <NodeActionsMenu node={node} {...actions} />
       </div>
 
       <div className="min-w-0">
