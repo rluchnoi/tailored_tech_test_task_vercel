@@ -11,10 +11,12 @@ import type { DataRoomNode } from "@/lib/types";
 export function NodeRow({
   node,
   onOpen,
+  index = 0,
   ...actions
 }: {
   node: DataRoomNode;
   onOpen: () => void;
+  index?: number;
 } & NodeActionHandlers) {
   return (
     <li
@@ -27,7 +29,8 @@ export function NodeRow({
           onOpen();
         }
       }}
-      className="group grid cursor-pointer grid-cols-[1fr_auto] items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:grid-cols-[1fr_120px_160px_40px]"
+      style={{ animationDelay: `${Math.min(index * 22, 260)}ms` }}
+      className="group animate-rise grid cursor-pointer grid-cols-[1fr_auto] items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring sm:grid-cols-[1fr_120px_160px_40px]"
     >
       <div className="flex min-w-0 items-center gap-3">
         <NodeIcon node={node} size="sm" />

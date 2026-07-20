@@ -7,9 +7,10 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-heading: var(--font-fredoka), var(--font-jakarta), sans-serif;
+  --font-display: var(--font-fredoka), var(--font-jakarta), sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -39,6 +40,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -46,85 +49,222 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Slightly larger, roomier type scale than Tailwind's defaults — the whole UI
+     reads a notch bigger without touching the (rem-based) spacing scale. */
+  --text-xs: 0.8125rem;
+  --text-xs--line-height: 1.5;
+  --text-sm: 0.9375rem;
+  --text-sm--line-height: 1.5;
+  --text-base: 1.0625rem;
+  --text-base--line-height: 1.6;
+  --text-lg: 1.1875rem;
+  --text-lg--line-height: 1.5;
+  --text-xl: 1.375rem;
+  --text-xl--line-height: 1.35;
+  --text-2xl: 1.625rem;
+  --text-2xl--line-height: 1.3;
+
+  --animate-rise: rise 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-float: float 5s ease-in-out infinite;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(9px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
 }
 
+/*
+ * Design tokens live per-theme. `next-themes` writes the active theme's name
+ * onto <html> as a class (dark / white / red). `:root, .dark` carries the
+ * default dark palette; `.white` and `.red` override the visible tokens after
+ * it in source order (equal specificity, later wins). Acme red is the brand
+ * accent throughout — vivid red on dark, a full red wash in the red theme, and
+ * reserved for the logo/destructive actions in the clean white theme.
+ * `--glow` drives the soft corner glow behind the content and stays red in
+ * every theme to keep the brand present.
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  --radius: 0.7rem;
+  /* Acme brand red — a fixed colour used for the primary CTAs and logo so they
+     stay unmistakably "Acme" in every theme, including the neutral white one. */
+  --brand: oklch(0.585 0.22 27);
+  --brand-foreground: oklch(0.99 0.012 25);
 }
 
+:root,
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  color-scheme: dark;
+  --background: oklch(0.17 0.012 265);
+  --foreground: oklch(0.965 0.004 265);
+  --card: oklch(0.215 0.014 265);
+  --card-foreground: oklch(0.965 0.004 265);
+  --popover: oklch(0.215 0.014 265);
+  --popover-foreground: oklch(0.965 0.004 265);
+  --primary: oklch(0.62 0.21 25);
+  --primary-foreground: oklch(0.99 0.012 25);
+  --secondary: oklch(0.27 0.016 265);
+  --secondary-foreground: oklch(0.965 0.004 265);
+  --muted: oklch(0.27 0.016 265);
+  --muted-foreground: oklch(0.72 0.02 265);
+  --accent: oklch(0.33 0.09 27);
+  --accent-foreground: oklch(0.97 0.02 27);
+  --destructive: oklch(0.68 0.2 22);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 14%);
+  --ring: oklch(0.62 0.21 25);
+  --glow: oklch(0.62 0.21 25);
+  --chart-1: oklch(0.62 0.21 25);
+  --chart-2: oklch(0.7 0.16 45);
+  --chart-3: oklch(0.72 0.13 90);
+  --chart-4: oklch(0.6 0.13 250);
+  --chart-5: oklch(0.65 0.15 320);
+  --sidebar: oklch(0.195 0.013 265);
+  --sidebar-foreground: oklch(0.965 0.004 265);
+  --sidebar-primary: oklch(0.62 0.21 25);
+  --sidebar-primary-foreground: oklch(0.99 0.012 25);
+  --sidebar-accent: oklch(0.31 0.07 27);
+  --sidebar-accent-foreground: oklch(0.97 0.02 27);
+  --sidebar-border: oklch(1 0 0 / 8%);
+  --sidebar-ring: oklch(0.62 0.21 25);
+}
+
+.white {
+  color-scheme: light;
+  --background: oklch(0.99 0.002 265);
+  --foreground: oklch(0.2 0.008 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.2 0.008 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.2 0.008 265);
+  --primary: oklch(0.25 0.01 265);
+  --primary-foreground: oklch(0.99 0.002 265);
+  --secondary: oklch(0.965 0.003 265);
+  --secondary-foreground: oklch(0.25 0.01 265);
+  --muted: oklch(0.965 0.003 265);
+  --muted-foreground: oklch(0.5 0.012 265);
+  --accent: oklch(0.95 0.005 265);
+  --accent-foreground: oklch(0.25 0.01 265);
+  --destructive: oklch(0.577 0.245 27);
+  --border: oklch(0.91 0.004 265);
+  --input: oklch(0.91 0.004 265);
+  --ring: oklch(0.62 0.03 265);
+  --glow: oklch(0.62 0.2 27);
+  --sidebar: oklch(0.975 0.002 265);
+  --sidebar-foreground: oklch(0.2 0.008 265);
+  --sidebar-primary: oklch(0.25 0.01 265);
+  --sidebar-primary-foreground: oklch(0.99 0.002 265);
+  --sidebar-accent: oklch(0.95 0.005 265);
+  --sidebar-accent-foreground: oklch(0.25 0.01 265);
+  --sidebar-border: oklch(0.91 0.004 265);
+  --sidebar-ring: oklch(0.62 0.03 265);
+}
+
+.red {
+  color-scheme: light;
+  --background: oklch(0.982 0.018 22);
+  --foreground: oklch(0.24 0.035 25);
+  --card: oklch(0.998 0.008 22);
+  --card-foreground: oklch(0.24 0.035 25);
+  --popover: oklch(0.998 0.008 22);
+  --popover-foreground: oklch(0.24 0.035 25);
+  --primary: oklch(0.575 0.218 27);
+  --primary-foreground: oklch(0.99 0.01 25);
+  --secondary: oklch(0.945 0.05 22);
+  --secondary-foreground: oklch(0.42 0.17 27);
+  --muted: oklch(0.95 0.038 22);
+  --muted-foreground: oklch(0.5 0.1 27);
+  --accent: oklch(0.92 0.07 22);
+  --accent-foreground: oklch(0.44 0.19 27);
+  --destructive: oklch(0.51 0.24 20);
+  --border: oklch(0.89 0.05 22);
+  --input: oklch(0.89 0.05 22);
+  --ring: oklch(0.575 0.218 27);
+  --glow: oklch(0.6 0.22 27);
+  --sidebar: oklch(0.965 0.035 22);
+  --sidebar-foreground: oklch(0.24 0.035 25);
+  --sidebar-primary: oklch(0.575 0.218 27);
+  --sidebar-primary-foreground: oklch(0.99 0.01 25);
+  --sidebar-accent: oklch(0.92 0.075 22);
+  --sidebar-accent-foreground: oklch(0.44 0.19 27);
+  --sidebar-border: oklch(0.89 0.05 22);
+  --sidebar-ring: oklch(0.575 0.218 27);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
-  body {
-    @apply bg-background text-foreground;
-  }
   html {
     @apply font-sans;
+  }
+  body {
+    @apply text-foreground;
+    background-color: var(--background);
+    /* Two soft, brand-red corner glows give the flat page some depth. */
+    background-image:
+      radial-gradient(
+        1000px 720px at 100% -6%,
+        color-mix(in oklch, var(--glow) 12%, transparent),
+        transparent 55%
+      ),
+      radial-gradient(
+        900px 620px at -8% 112%,
+        color-mix(in oklch, var(--glow) 7%, transparent),
+        transparent 60%
+      );
+    background-attachment: fixed;
+    /* Colour tokens cross-fade when the theme changes. */
+    transition:
+      background-color 0.35s ease,
+      color 0.35s ease;
+  }
+
+  /* Themed, unobtrusive scrollbars for the main scroll regions. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in oklch, var(--foreground) 22%, transparent)
+      transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklch, var(--foreground) 20%, transparent);
+    border: 3px solid transparent;
+    background-clip: padding-box;
+    border-radius: 9999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in oklch, var(--foreground) 32%, transparent);
+  }
+}
+
+/* Honour reduced-motion: strip entrance/float animations and long transitions. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

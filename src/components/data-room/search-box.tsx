@@ -14,8 +14,8 @@ export function SearchBox({ className }: { className?: string }) {
   const { searchQuery, setSearchQuery } = useDataRoom();
 
   return (
-    <div className={cn("relative", className)}>
-      <Search className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2" />
+    <div className={cn("group relative", className)}>
+      <Search className="text-muted-foreground group-focus-within:text-foreground pointer-events-none absolute left-2.5 top-1/2 size-4 -translate-y-1/2 transition-colors" />
       <Input
         type="search"
         role="searchbox"
@@ -24,7 +24,7 @@ export function SearchBox({ className }: { className?: string }) {
         onKeyDown={(e) => e.key === "Escape" && setSearchQuery("")}
         placeholder="Search documents…"
         aria-label="Search documents by name"
-        className="h-9 pl-8 pr-8 [&::-webkit-search-cancel-button]:appearance-none"
+        className="bg-card h-9 pl-8 pr-8 shadow-sm [&::-webkit-search-cancel-button]:appearance-none"
       />
       {searchQuery && (
         <button

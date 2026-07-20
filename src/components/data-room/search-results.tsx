@@ -26,11 +26,13 @@ export function SearchResults({
 
   if (searchResults.length === 0) {
     return (
-      <div className="flex h-full flex-col items-center justify-center px-6 py-16 text-center">
+      <div className="animate-rise flex h-full flex-col items-center justify-center px-6 py-16 text-center">
         <div className="bg-muted text-muted-foreground flex size-16 items-center justify-center rounded-2xl">
           <SearchX className="size-8" />
         </div>
-        <h2 className="mt-5 text-lg font-semibold">No documents found</h2>
+        <h2 className="font-display mt-5 text-xl font-semibold tracking-tight">
+          No documents found
+        </h2>
         <p className="text-muted-foreground mt-1.5 max-w-sm text-sm">
           Nothing matches{" "}
           <span className="text-foreground font-medium">
@@ -50,12 +52,13 @@ export function SearchResults({
           “{searchQuery.trim()}”
         </span>
       </p>
-      <div className="overflow-hidden rounded-xl border">
+      <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
         <ul className="divide-y">
-          {searchResults.map((result) => (
+          {searchResults.map((result, i) => (
             <SearchResultRow
               key={result.node.id}
               result={result}
+              index={i}
               query={searchQuery.trim()}
               onOpen={() => onOpen(result.node)}
               {...actions}
@@ -71,11 +74,13 @@ function SearchResultRow({
   result,
   query,
   onOpen,
+  index = 0,
   ...actions
 }: {
   result: SearchResult;
   query: string;
   onOpen: () => void;
+  index?: number;
 } & NodeActionHandlers) {
   const { node, path } = result;
 
@@ -90,7 +95,8 @@ function SearchResultRow({
           onOpen();
         }
       }}
-      className="group grid cursor-pointer grid-cols-[1fr_auto] items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+      style={{ animationDelay: `${Math.min(index * 22, 260)}ms` }}
+      className="group animate-rise grid cursor-pointer grid-cols-[1fr_auto] items-center gap-3 px-4 py-2.5 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
     >
       <div className="flex min-w-0 items-center gap-3">
         <NodeIcon node={node} size="sm" />

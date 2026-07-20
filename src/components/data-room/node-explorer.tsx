@@ -55,7 +55,7 @@ export function NodeExplorer({
   if (viewMode === "list") {
     return (
       <div className="mx-auto max-w-6xl px-4 py-4 sm:px-6">
-        <div className="overflow-hidden rounded-xl border">
+        <div className="bg-card overflow-hidden rounded-xl border shadow-sm">
           <div className="text-muted-foreground bg-muted/50 hidden grid-cols-[1fr_120px_160px_40px] gap-3 border-b px-4 py-2.5 text-xs font-medium sm:grid">
             <span>Name</span>
             <span>Size</span>
@@ -63,10 +63,11 @@ export function NodeExplorer({
             <span className="sr-only">Actions</span>
           </div>
           <ul className="divide-y">
-            {children.map((node) => (
+            {children.map((node, i) => (
               <NodeRow
                 key={node.id}
                 node={node}
+                index={i}
                 onOpen={() => open(node)}
                 {...actions}
               />
@@ -80,10 +81,11 @@ export function NodeExplorer({
   return (
     <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {children.map((node) => (
+        {children.map((node, i) => (
           <NodeCard
             key={node.id}
             node={node}
+            index={i}
             onOpen={() => open(node)}
             {...actions}
           />

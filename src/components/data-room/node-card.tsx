@@ -16,10 +16,12 @@ import type { DataRoomNode } from "@/lib/types";
 export function NodeCard({
   node,
   onOpen,
+  index = 0,
   ...actions
 }: {
   node: DataRoomNode;
   onOpen: () => void;
+  index?: number;
 } & NodeActionHandlers) {
   const meta = isFile(node)
     ? `${formatBytes(node.size)} · ${formatRelativeTime(node.updatedAt)}`
@@ -36,9 +38,12 @@ export function NodeCard({
           onOpen();
         }
       }}
+      // Capped stagger so a large folder still finishes settling quickly.
+      style={{ animationDelay: `${Math.min(index * 28, 320)}ms` }}
       className={cn(
-        "group bg-background relative flex flex-col gap-3 rounded-xl border p-3.5 text-left transition-all",
-        "hover:border-foreground/15 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer",
+        "group animate-rise bg-card relative flex flex-col gap-3 rounded-xl border p-3.5 text-left",
+        "transition-[box-shadow,border-color,background-color] duration-200 ease-out",
+        "hover:border-primary/35 hover:bg-accent/40 hover:shadow-md hover:shadow-primary/5 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
       )}
     >
       <div className="flex items-start justify-between">

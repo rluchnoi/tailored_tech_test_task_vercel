@@ -69,9 +69,9 @@ export function DropZone({
       {children}
 
       {isDragging && (
-        <div className="bg-background/70 pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="border-primary/40 bg-background flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed px-10 py-8 shadow-lg">
-            <div className="bg-primary/10 text-primary flex size-12 items-center justify-center rounded-full">
+        <div className="bg-background/70 animate-in fade-in-0 pointer-events-none absolute inset-0 z-20 flex items-center justify-center p-4 backdrop-blur-sm duration-150">
+          <div className="border-primary/40 bg-card animate-in zoom-in-95 flex flex-col items-center gap-3 rounded-2xl border-2 border-dashed px-10 py-8 shadow-xl duration-200">
+            <div className="bg-primary/10 text-primary animate-float flex size-12 items-center justify-center rounded-full">
               <UploadCloud className="size-6" />
             </div>
             <p className="text-sm font-medium">Drop PDFs to upload</p>
